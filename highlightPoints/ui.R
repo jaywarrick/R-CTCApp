@@ -21,17 +21,21 @@ shinyUI(fluidPage(
       
       checkboxInput("x1cursor", "Show x cursors", FALSE),     
     
-       sliderInput("x1Range","X",
-                   min = 1,
-                   max = 50,
-                   value = c(10, 40)),
+      conditionalPanel(condition = "input.x1cursor == true",
+             sliderInput("x1Range","X",
+                         min = 1,
+                         max = 50,
+                         value = c(10, 40))
+      ),
       
       checkboxInput("y1cursor", "Show y cursors", FALSE),
   
-       sliderInput("y1Range", "Y",
-                   min = 101, 
-                   max = 105, 
-                   value = c(101,107))
+      conditionalPanel(condition = "input.y1cursor == true",
+             sliderInput("y1Range", "Y",
+                         min = 100, 
+                         max = 107, 
+                         value = c(101,105))
+      )
    
     ),
     
