@@ -1,4 +1,6 @@
+rm(list=ls())
 source("C:/Users/Mengcheng/Documents/GitHub/R-CTC/AnalyzeCTCs_HelperFunctions.R")
+library(foreign)
 
 shinyServer(function(input, output) {
 
