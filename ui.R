@@ -6,6 +6,8 @@ shinyUI(fluidPage(
 
           sidebarPanel(
 
+               width=5,
+
                fileInput("data", label="Data file"),
 
                hr(),
@@ -23,7 +25,10 @@ shinyUI(fluidPage(
                                         choices = list("+" = 1, "-" = 2),selected = 1)),
                     column(3,
                            radioButtons("x1Auto", label = "Threshold",
-                                        choices = list("auto" = 1, "manual" = 2),selected = 1)
+                                        choices = list("auto" = 1, "manual" = 2),selected = 1)),
+                    column(3,
+                           radioButtons("x1Log", label = "Scale",
+                                        choices = list("log" = 1, "lin" = 2),selected = 1)
                     )
                ),
 
@@ -49,7 +54,10 @@ shinyUI(fluidPage(
                                         choices = list("+" = 1, "-" = 2),selected = 1)),
                     column(3,
                            radioButtons("y1Auto", label = "Threshold",
-                                        choices = list("auto" = 1, "manual" = 2),selected = 1)
+                                        choices = list("auto" = 1, "manual" = 2),selected = 1)),
+                    column(3,
+                           radioButtons("y1Log", label = "Scale",
+                                        choices = list("log" = 1, "lin" = 2),selected = 1)
                     )
                ),
 
@@ -65,6 +73,7 @@ shinyUI(fluidPage(
           ),
 
           mainPanel(
+               width=7,
                plotOutput("plot1")
           )
      )
