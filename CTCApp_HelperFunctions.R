@@ -43,6 +43,11 @@ reorganizeTable <- function(data, baseName=NA, convertToNumeric=TRUE)
      return(newData)
 }
 
+s <- function(...)
+{
+     paste0(...)
+}
+
 getMads <- function(data)
 {
      temp <- data.table(data)
@@ -66,7 +71,234 @@ translateNames <- function(data, newNames=list('395'='Nuc','485'='Cyt','560'='Ep
      return(data)
 }
 
+getAutoThresh <- function(filterNumber, table, column, tail, log, mads, logMads)
+{
+     if(is.null(column) || (column == 'None'))
+     {
+          0
+     }
+     else
+     {
+          if(tail==2)
+          {
+               if(log == 1)
+               {
+                    as.numeric(10^(log10(median(table[,column], na.rm=T)) + 3*logMads[column]))
+               }
+               else
+               {
+                    as.numeric(median(table[,column], na.rm=T) + 3*mads[column])
+               }
+          }
+          else
+          {
+               if(log == 1)
+               {
+                    as.numeric(10^(log10(median(table[,column], na.rm=T)) - 3*logMads[column]))
+               }
+               else
+               {
+                    as.numeric(median(table[,column], na.rm=T) - 3*mads[column])
+               }
+          }
+     }
+}
 
+getGood <- function(filterNumber, table, x, y, choiceX, choiceY, autoX, autoY, threshX, threshY, logX, logY, rangeX, rangeY)
+{
+     # Grab either the + or minus population based on user choice and call it good and the other bad
+     if(is.null(x) || x == 'None')
+     {
+          goodX <- rep(T, length(nrow(table)))
+     }
+     else if(autoX==1)
+     {
+          goodX <- (table[,x] > threshX) == (choiceX == 1)
+     }
+     else
+     {
+          if(logX == 1)
+          {
+               goodX <- ((table[,x] > 10^rangeX[1]) & (table[,x] < 10^rangeX[2]))  == (choiceX == 1)
+          }
+          else
+          {
+               goodX <- ((table[,x] > rangeX[1]) & (table[,x] < rangeX[2]))  == (choiceX == 1)
+          }
+     }
+     if(is.null(y) || y == 'None')
+     {
+          goodY <- rep(T, length(nrow(table)))
+     }
+     else if(autoY==1)
+     {
+          goodY <- (table[,y] > threshY) == (choiceY == 1)
+     }
+     else
+     {
+          if(logY == 1)
+          {
+               goodY <- ((table[,y] > 10^rangeY[1]) & (table[,y] < 10^rangeY[2]))  == (choiceY == 1)
+          }
+          else
+          {
+               goodY <- ((table[,y] > rangeY[1]) & (table[,y] < rangeY[2]))  == (choiceY == 1)
+          }
+     }
+     goodX & goodY
+}
+
+getThreshText <- function(column, thresh, auto, log, range)
+{
+     if(is.null(column) || column == 'None')
+     {
+          ''
+     }
+     else if(auto == 1)
+     {
+          nums <- format(round(thresh, 1), nsmall = 1)
+          txt <- paste(nums, collapse='')
+          paste("Threshold: ", txt, sep='')
+     }
+     else
+     {
+          if(log == 1)
+          {
+               nums <- format(round(10^range, 1), nsmall = 1)
+          }
+          else
+          {
+               nums <- format(round(range, 1), nsmall = 1)
+          }
+          txt <- paste(nums, collapse=' - ')
+          paste("Thresholds: ", txt, sep='')
+          txt <- paste(nums, collapse=' - ')
+          paste("Thresholds: ", txt, sep='')
+     }
+}
+
+getLogParam <- function(logX, logY)
+{
+     if(logX == 1 & logY == 1)
+     {
+          'xy'
+     }
+     else if(logX == 1)
+     {
+          'x'
+     }
+     else if(logY == 1)
+     {
+          'y'
+     }
+     else
+     {
+          ''
+     }
+}
+
+getPlot <- function(table, x, y, good, logX, logY, randoms, autoX, autoY, threshX, threshY, rangeX, rangeY)
+{
+     if((is.null(x) && is.null(y)) || ((x == 'None') && (y == 'None')))
+     {
+          # Do nothing
+          NULL
+     }
+     else
+     {
+          bad <- !good
+
+          # Make the main plot
+          if(is.null(x) || x == 'None')
+          {
+               xlim <- c(1,3)
+               x1 <- randoms
+          }
+          else
+          {
+               x1 <- table[,x]
+               if(logX == 1)
+               {
+                    xlim <- range(x1[x1 > 0])
+               }
+               else
+               {
+                    xlim <- range(x1)
+               }
+          }
+          if(is.null(y) || y == 'None')
+          {
+               ylim <- c(1,3)
+               y1 <- randoms
+          }
+          else
+          {
+               y1 <- table[,y]
+               if(logY == 1)
+               {
+                    ylim <- range(y1[y1 > 0])
+               }
+               else
+               {
+                    ylim <- range(y1)
+               }
+          }
+          plot(x1[bad], y1[bad], pch=20, col=rgb(0,0,0,0.25), bg=rgb(0,0,0,0.25), xlim=xlim, ylim=ylim, xlab=x, ylab=y, log=getLogParam(logX, logY))
+          points(x1[good], y1[good], pch=20, col=rgb(1,0,0,0.25), bg=rgb(1,0,0,0.25))
+
+          # Plot threshold lines
+          if(autoX == 1)
+          {
+               abline(v=threshX)
+          }
+          else
+          {
+               if(logX == 1)
+               {
+                    abline(v=10^rangeX)
+               }
+               else
+               {
+                    abline(v=rangeX)
+               }
+          }
+          if(autoY == 1)
+          {
+               abline(h=threshY)
+          }
+          else
+          {
+               if(logY == 1)
+               {
+                    abline(h=10^rangeY)
+               }
+               else
+               {
+                    abline(h=rangeY)
+               }
+          }
+     }
+}
+
+getSliderUI <- function(name, axis='x', table, column, auto, log)
+{
+     if (!is.null(column)  && column != 'None' && auto==2)
+     {
+          nums <- table[,column]
+          if(log == 1)
+          {
+               temp <- range(nums[nums > 0])
+               temp <- log10(temp)
+               sliderLabel <- s('log10(', axis, ')')
+          }
+          else
+          {
+               temp <- range(nums)
+               sliderLabel <- axis
+          }
+          sliderInput(inputId=name,label=sliderLabel, min=temp[1], max=temp[2], value=c(temp[1],temp[2]))
+     }
+}
 
 ##%%%%%%%%%%%%%%%%%%%%
 
