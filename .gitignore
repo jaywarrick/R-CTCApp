@@ -2,3 +2,15 @@
 .RData
 
 .Rhistory
+
+*.docx
+
+*.arff
+
+.Rhistory
+
+.RData
+
+*.history
+
+*.pdf

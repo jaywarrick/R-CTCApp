@@ -8,73 +8,44 @@ shinyUI(fluidPage(
 
                width=5,
 
+               actionButton("closeButton", "Click HERE to CLOSE app properly!"),
+
                fileInput("data", label="Data file"),
 
-               hr(),
+               getFilterUI(1),
 
-               h3("Filter 1"),
+               getFilterUI(2),
 
-               uiOutput("x1Select"),
+               getFilterUI(3),
 
-               fluidRow(
-                    column(3,
-                           radioButtons("x1Tail", label = "Tail",
-                                        choices = list("Lower" = 1, "Upper" = 2),selected = 1)),
-                    column(3,
-                           radioButtons("x1Choice", label = "+/-",
-                                        choices = list("+" = 1, "-" = 2),selected = 1)),
-                    column(3,
-                           radioButtons("x1Auto", label = "Threshold",
-                                        choices = list("auto" = 1, "manual" = 2),selected = 1)),
-                    column(3,
-                           radioButtons("x1Log", label = "Scale",
-                                        choices = list("log" = 1, "lin" = 2),selected = 1)
-                    )
-               ),
-
-               fluidRow(
-                    textOutput("x1Threshold"),
-
-                    conditionalPanel("input.x1Auto == 2",
-                                     # Then manual
-                                     uiOutput("x1Slider")
-                    )
-               ),
+               getFinalPlotUI(4),
 
                hr(),
 
-               uiOutput("y1Select"),
-
-               fluidRow(
-                    column(3,
-                           radioButtons("y1Tail", label = "Tail",
-                                        choices = list("Lower" = 1, "Upper" = 2),selected = 1)),
-                    column(3,
-                           radioButtons("y1Choice", label = "+/-",
-                                        choices = list("+" = 1, "-" = 2),selected = 1)),
-                    column(3,
-                           radioButtons("y1Auto", label = "Threshold",
-                                        choices = list("auto" = 1, "manual" = 2),selected = 1)),
-                    column(3,
-                           radioButtons("y1Log", label = "Scale",
-                                        choices = list("log" = 1, "lin" = 2),selected = 1)
-                    )
-               ),
-
-               fluidRow(
-                    textOutput("y1Threshold"),
-
-                    conditionalPanel("input.y1Auto == 2",
-                                     # Then manual
-                                     uiOutput("y1Slider")
-                    )
-               )
+               downloadButton('downloadReport')
 
           ),
 
           mainPanel(
                width=7,
-               plotOutput("plot1")
+               br(),
+               br(),
+               br(),
+               plotOutput("plot1"),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               plotOutput("plot2"),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               plotOutput("plot3"),
+               br(),
+               plotOutput("plot4")
           )
      )
 

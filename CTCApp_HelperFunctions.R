@@ -148,7 +148,7 @@ getGood <- function(filterNumber, table, x, y, choiceX, choiceY, autoX, autoY, t
      goodX & goodY
 }
 
-getThreshText <- function(column, thresh, auto, log, range)
+getThreshText = function(column, thresh, auto, log, range)
 {
      if(is.null(column) || column == 'None')
      {
@@ -156,23 +156,28 @@ getThreshText <- function(column, thresh, auto, log, range)
      }
      else if(auto == 1)
      {
-          nums <- format(round(thresh, 1), nsmall = 1)
-          txt <- paste(nums, collapse='')
+          if(log == 1)
+          {
+               temp <- format(thresh, digits=3, scientific=TRUE)
+          }
+          else
+          {
+               temp <- format(round(thresh, 1), nsmall = 1)
+          }
+          txt <- paste(temp, collapse='')
           paste("Threshold: ", txt, sep='')
      }
      else
      {
           if(log == 1)
           {
-               nums <- format(round(10^range, 1), nsmall = 1)
+               temp <- format(10^range, digits=3, scientific=TRUE)
           }
           else
           {
-               nums <- format(round(range, 1), nsmall = 1)
+               temp <- format(round(range, 1), nsmall = 1)
           }
-          txt <- paste(nums, collapse=' - ')
-          paste("Thresholds: ", txt, sep='')
-          txt <- paste(nums, collapse=' - ')
+          txt <- paste(temp, collapse=' - ')
           paste("Thresholds: ", txt, sep='')
      }
 }
@@ -197,7 +202,7 @@ getLogParam <- function(logX, logY)
      }
 }
 
-getPlot <- function(table, x, y, good, logX, logY, randoms, autoX, autoY, threshX, threshY, rangeX, rangeY)
+getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, autoY, threshX, threshY, rangeX, rangeY)
 {
      if((is.null(x) && is.null(y)) || ((x == 'None') && (y == 'None')))
      {
@@ -206,7 +211,7 @@ getPlot <- function(table, x, y, good, logX, logY, randoms, autoX, autoY, thresh
      }
      else
      {
-          bad <- !good
+          bad <- !(goodOld | goodNew)
 
           # Make the main plot
           if(is.null(x) || x == 'None')
@@ -243,41 +248,176 @@ getPlot <- function(table, x, y, good, logX, logY, randoms, autoX, autoY, thresh
                     ylim <- range(y1)
                }
           }
-          plot(x1[bad], y1[bad], pch=20, col=rgb(0,0,0,0.25), bg=rgb(0,0,0,0.25), xlim=xlim, ylim=ylim, xlab=x, ylab=y, log=getLogParam(logX, logY))
-          points(x1[good], y1[good], pch=20, col=rgb(1,0,0,0.25), bg=rgb(1,0,0,0.25))
+          plot(x1[bad], y1[bad], pch=20, col=rgb(0,0,1,0.25), bg=rgb(0,0,1,0.25), xlim=xlim, ylim=ylim, xlab=x, ylab=y, log=getLogParam(logX, logY))
+          points(x1[goodOld], y1[goodOld], pch=20, col=rgb(1,0,0,0.25), bg=rgb(1,0,0,0.25))
+          points(x1[goodNew], y1[goodNew], pch=20, col=rgb(0,1,0,0.25), bg=rgb(0,1,0,0.25))
 
           # Plot threshold lines
-          if(autoX == 1)
+          if(!is.null(autoX))
           {
-               abline(v=threshX)
-          }
-          else
-          {
-               if(logX == 1)
+               if(autoX == 1)
                {
-                    abline(v=10^rangeX)
+                    abline(v=threshX)
                }
                else
                {
-                    abline(v=rangeX)
+                    if(logX == 1)
+                    {
+                         abline(v=10^rangeX)
+                    }
+                    else
+                    {
+                         abline(v=rangeX)
+                    }
                }
           }
-          if(autoY == 1)
+          if(!is.null(autoY))
           {
-               abline(h=threshY)
-          }
-          else
-          {
-               if(logY == 1)
+               if(autoY == 1)
                {
-                    abline(h=10^rangeY)
+                    abline(h=threshY)
                }
                else
                {
-                    abline(h=rangeY)
+                    if(logY == 1)
+                    {
+                         abline(h=10^rangeY)
+                    }
+                    else
+                    {
+                         abline(h=rangeY)
+                    }
                }
           }
      }
+}
+
+getFilterUI <- function(i)
+{
+     list(hr(),
+
+          h3(s('Filter ', i)),
+
+          uiOutput(s('x',i,'Select')),
+
+          fluidRow(
+               column(3,
+                      radioButtons(s('x',i,'Tail'), label = "Tail",
+                                   choices = list("Lower" = 1, "Upper" = 2),selected = 1)),
+               column(3,
+                      radioButtons(s('x',i,'Choice'), label = "+/-",
+                                   choices = list("+" = 1, "-" = 2),selected = 1)),
+               column(3,
+                      radioButtons(s('x',i,'Auto'), label = "Threshold",
+                                   choices = list("auto" = 1, "manual" = 2),selected = 1)),
+               column(3,
+                      radioButtons(s('x',i,'Log'), label = "Scale",
+                                   choices = list("log" = 1, "lin" = 2),selected = 1)
+               )
+          ),
+
+          fluidRow(
+               textOutput(s('x',i,'Threshold')),
+
+               conditionalPanel(s('input.x',i,'Auto == 2'),
+                                # Then manual
+                                uiOutput(s('x',i,'Slider'))
+               )
+          ),
+
+          hr(),
+
+          uiOutput(s('y',i,'Select')),
+
+          fluidRow(
+               column(3,
+                      radioButtons(s('y',i,'Tail'), label = "Tail",
+                                   choices = list("Lower" = 1, "Upper" = 2),selected = 1)),
+               column(3,
+                      radioButtons(s('y',i,'Choice'), label = "+/-",
+                                   choices = list("+" = 1, "-" = 2),selected = 1)),
+               column(3,
+                      radioButtons(s('y',i,'Auto'), label = "Threshold",
+                                   choices = list("auto" = 1, "manual" = 2),selected = 1)),
+               column(3,
+                      radioButtons(s('y',i,'Log'), label = "Scale",
+                                   choices = list("log" = 1, "lin" = 2),selected = 1)
+               )
+          ),
+
+          fluidRow(
+               textOutput(s('y',i,'Threshold')),
+
+               conditionalPanel(s('input.y',i,'Auto == 2'),
+                                # Then manual
+                                uiOutput(s('y',i,'Slider'))
+               )
+          )
+     )
+}
+
+getFinalPlotUI <- function(i)
+{
+     list(hr(),
+
+          h3(s('Final Plot', i-3)),
+
+          uiOutput(paste0('x',i,'Select')),
+
+          fluidRow(
+               #                column(3,
+               #                       radioButtons(s('x',i,'Tail'), label = "Tail",
+               #                                    choices = list("Lower" = 1, "Upper" = 2),selected = 1)),
+               #                column(3,
+               #                       radioButtons(s('x',i,'Choice'), label = "+/-",
+               #                                    choices = list("+" = 1, "-" = 2),selected = 1)),
+               #                column(3,
+               #                       radioButtons(s('x',i,'Auto'), label = "Threshold",
+               #                                    choices = list("auto" = 1, "manual" = 2),selected = 1)),
+               column(3,
+                      radioButtons(s('x',i,'Log'), label = "Scale",
+                                   choices = list("log" = 1, "lin" = 2),selected = 1)
+               )
+          ),
+
+          #           fluidRow(
+          #                textOutput(s('x',i,'Threshold')),
+          #
+          #                conditionalPanel(s('input.x',i,'Auto == 2'),
+          #                                 # Then manual
+          #                                 uiOutput(s('x',i,'Slider'))
+          #                )
+          #           ),
+
+          hr(),
+
+          uiOutput(paste0('y',i,'Select')),
+
+          fluidRow(
+               #                column(3,
+               #                       radioButtons(s('y',i,'Tail'), label = "Tail",
+               #                                    choices = list("Lower" = 1, "Upper" = 2),selected = 1)),
+               #                column(3,
+               #                       radioButtons(s('y',i,'Choice'), label = "+/-",
+               #                                    choices = list("+" = 1, "-" = 2),selected = 1)),
+               #                column(3,
+               #                       radioButtons(s('y',i,'Auto'), label = "Threshold",
+               #                                    choices = list("auto" = 1, "manual" = 2),selected = 1)),
+               column(3,
+                      radioButtons(s('y',i,'Log'), label = "Scale",
+                                   choices = list("log" = 1, "lin" = 2),selected = 1)
+               )
+          )
+
+          #           fluidRow(
+          #                textOutput(s('y',i,'Threshold')),
+          #
+          #                conditionalPanel(s('input.y',i,'Auto == 2'),
+          #                                 # Then manual
+          #                                 uiOutput(s('y',i,'Slider'))
+          #                )
+          #           )
+     )
 }
 
 getSliderUI <- function(name, axis='x', table, column, auto, log)

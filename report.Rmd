@@ -1,0 +1,73 @@
+---
+title: "CTC App Report"
+---
+
+## Filter 1
+
+### X 
+
+* `r input$x1`
+* `r if(input$x1Tail==1){'Lower'}else{'Upper'}` Tail, `r if(input$x1Choice==1){'+'}else{'-'}`
+* `r getThreshText(column=input$x1, thresh=x1Thresh(), auto=input$x1Auto, log=input$x1Log, range=input$x1Range)` (`r if(input$x1Auto==1){'Automatic'}else{'Manual'}`)
+  
+### Y
+
+* `r input$y1`
+* `r if(input$y1Tail==1){'Lower'}else{'Upper'}` Tail, `r if(input$y1Choice==1){'+'}else{'-'}`
+* `r getThreshText(column=input$y1, thresh=y1Thresh(), auto=input$y1Auto, log=input$y1Log, range=input$y1Range)` (`r if(input$y1Auto==1){'Automatic'}else{'Manual'}`)  
+  
+```{r echo=FALSE}
+getPlot(table=theTable(), x=input$x1, y=input$y1, goodOld=TRUE, goodNew=theGood1(), logX=input$x1Log, logY=input$y1Log, randoms=theRandoms(), autoX=input$x1Auto, autoY=input$y1Auto, threshX=x1Thresh(), threshY=y1Thresh(), rangeX=input$x1Range, rangeY=input$y1Range)
+```
+  
+## Filter 2
+
+### X
+
+* `r input$x2`
+* `r if(input$x2Tail==1){'Lower'}else{'Upper'}` Tail, `r if(input$x2Choice==1){'+'}else{'-'}`
+* `r getThreshText(column=input$x2, thresh=x2Thresh(), auto=input$x2Auto, log=input$x2Log, range=input$x2Range)` (`r if(input$x2Auto==1){'Automatic'}else{'Manual'}`)
+
+### Y
+
+* `r input$y2`
+* `r if(input$y2Tail==1){'Lower'}else{'Upper'}` Tail, `r if(input$y2Choice==1){'+'}else{'-'}`
+* `r getThreshText(column=input$y2, thresh=y2Thresh(), auto=input$y2Auto, log=input$y2Log, range=input$y2Range)` (`r if(input$y2Auto==1){'Automatic'}else{'Manual'}`)
+
+```{r echo=FALSE}
+getPlot(table=theTable(), x=input$x2, y=input$y2, goodOld=theGood1(), goodNew=theGood1() & theGood2(), logX=input$x2Log, logY=input$y2Log, randoms=theRandoms(), autoX=input$x2Auto, autoY=input$y2Auto, threshX=x2Thresh(), threshY=y2Thresh(), rangeX=input$x2Range, rangeY=input$y2Range)
+```
+
+## Filter 3
+
+### X
+
+* `r input$x3`
+* `r if(input$x3Tail==1){'Lower'}else{'Upper'}` Tail, `r if(input$x3Choice==1){'+'}else{'-'}`
+* `r getThreshText(column=input$x3, thresh=x3Thresh(), auto=input$x3Auto, log=input$x3Log, range=input$x3Range)` (`r if(input$x3Auto==1){'Automatic'}else{'Manual'}`)
+
+### Y
+
+* `r input$y3`
+* `r if(input$y3Tail==1){'Lower'}else{'Upper'}` Tail, `r if(input$y3Choice==1){'+'}else{'-'}`
+* `r getThreshText(column=input$y3, thresh=y3Thresh(), auto=input$y3Auto, log=input$y3Log, range=input$y3Range)` (`r if(input$y3Auto==1){'Automatic'}else{'Manual'}`)
+
+```{r echo=FALSE}
+getPlot(table=theTable(), x=input$x3, y=input$y3, goodOld=theGood1() & theGood2(), goodNew=theGood1() & theGood2() & theGood3(), logX=input$x3Log, logY=input$y3Log, randoms=theRandoms(), autoX=input$x3Auto, autoY=input$y3Auto, threshX=x3Thresh(), threshY=y3Thresh(), rangeX=input$x3Range, rangeY=input$y3Range)
+```
+
+## Final Plot 1
+
+### X
+
+* `r input$x4`
+* Scale: `r if(input$x4Log==1){'Log'}else{'Linear'}`
+
+### Y
+
+* `r input$y4`
+* Scale: `r if(input$y4Log==1){'Log'}else{'Linear'}`
+
+```{r echo=FALSE}
+getPlot(table=theTable(), x=input$x4, y=input$y4, goodOld=!(theGood1() & theGood2() & theGood3()), goodNew=(theGood1() & theGood2() & theGood3()), logX=input$x4Log, logY=input$y4Log, randoms=theRandoms(), autoX=NULL, autoY=NULL, threshX=NULL, threshY=NULL, rangeX=NULL, rangeY=NULL)
+```

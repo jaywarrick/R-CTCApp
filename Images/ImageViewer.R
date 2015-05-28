@@ -1,7 +1,9 @@
-source('/Users/jaywarrick/Public/DropBox/GitHub/R-CTCApp/Images/ImageViewer.R')require(shiny)
-source('/Users/jaywarrick/Public/DropBox/GitHub/R-CTCApp/Images/ui.R');
+source('/Users/jaywarrick/Public/DropBox/GitHub/R-CTCApp/Images/ImageViewer.R')
+require(shiny)
 source('/Users/jaywarrick/Public/DropBox/GitHub/R-CTCApp/Images/server.R');
-runApp(shinyApp(ui=getUI(), server=getServer()), launch.browser=TRUE);
+source('/Users/jaywarrick/Public/DropBox/GitHub/R-CTCApp/Images/ui.R');
+
+runApp(shinyApp(ui=getUI(), server=getServer()))#, launch.browser=FALSE);
 # runApp(appDir='/Users/jaywarrick/Public/DropBox/GitHub/R-CTCApp/Images', launch.browser=T)
 
 
