@@ -109,40 +109,40 @@ getGood <- function(filterNumber, table, x, y, choiceX, choiceY, autoX, autoY, t
      # Grab either the + or minus population based on user choice and call it good and the other bad
      if(is.null(x) || x == 'None')
      {
-          goodX <- rep(T, length(nrow(table)))
+          goodX <- rep(T, nrow(table))
      }
      else if(autoX==1)
      {
-          goodX <- (table[,x] > threshX) == (choiceX == 1)
+          goodX <- (table[,x] >= threshX) == (choiceX == 1)
      }
      else
      {
           if(logX == 1)
           {
-               goodX <- ((table[,x] > 10^rangeX[1]) & (table[,x] < 10^rangeX[2]))  == (choiceX == 1)
+               goodX <- ((table[,x] >= 10^rangeX[1]) & (table[,x] <= 10^rangeX[2]))  == (choiceX == 1)
           }
           else
           {
-               goodX <- ((table[,x] > rangeX[1]) & (table[,x] < rangeX[2]))  == (choiceX == 1)
+               goodX <- ((table[,x] >= rangeX[1]) & (table[,x] <= rangeX[2]))  == (choiceX == 1)
           }
      }
      if(is.null(y) || y == 'None')
      {
-          goodY <- rep(T, length(nrow(table)))
+          goodY <- rep(T, nrow(table))
      }
      else if(autoY==1)
      {
-          goodY <- (table[,y] > threshY) == (choiceY == 1)
+          goodY <- (table[,y] >= threshY) == (choiceY == 1)
      }
      else
      {
           if(logY == 1)
           {
-               goodY <- ((table[,y] > 10^rangeY[1]) & (table[,y] < 10^rangeY[2]))  == (choiceY == 1)
+               goodY <- ((table[,y] >= 10^rangeY[1]) & (table[,y] <= 10^rangeY[2]))  == (choiceY == 1)
           }
           else
           {
-               goodY <- ((table[,y] > rangeY[1]) & (table[,y] < rangeY[2]))  == (choiceY == 1)
+               goodY <- ((table[,y] >= rangeY[1]) & (table[,y] <= rangeY[2]))  == (choiceY == 1)
           }
      }
      goodX & goodY
@@ -202,7 +202,7 @@ getLogParam <- function(logX, logY)
      }
 }
 
-getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, autoY, threshX, threshY, rangeX, rangeY)
+getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, autoY, threshX, threshY, rangeX, rangeY, Id=NULL, stateTable=NULL)
 {
      if((is.null(x) && is.null(y)) || ((x == 'None') && (y == 'None')))
      {
@@ -251,6 +251,14 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
           plot(x1[bad], y1[bad], pch=20, col=rgb(0,0,1,0.25), bg=rgb(0,0,1,0.25), xlim=xlim, ylim=ylim, xlab=x, ylab=y, log=getLogParam(logX, logY))
           points(x1[goodOld], y1[goodOld], pch=20, col=rgb(1,0,0,0.25), bg=rgb(1,0,0,0.25))
           points(x1[goodNew], y1[goodNew], pch=20, col=rgb(0,1,0,0.25), bg=rgb(0,1,0,0.25))
+          if(!is.null(Id))
+          {
+               points(x1[table$Id==Id], y1[table$Id==Id], pch=10, cex=2, col='black')
+          }
+          if(!is.null(stateTable) && nrow(stateTable) > 0)
+          {
+               points(x1[stateTable$No.Maybe.Yes==2], y1[stateTable$No.Maybe.Yes==2], pch=4, cex=1, col='black')
+          }
 
           # Plot threshold lines
           if(!is.null(autoX))
@@ -436,7 +444,7 @@ getSliderUI <- function(name, axis='x', table, column, auto, log)
                temp <- range(nums)
                sliderLabel <- axis
           }
-          sliderInput(inputId=name,label=sliderLabel, min=temp[1], max=temp[2], value=c(temp[1],temp[2]))
+          sliderInput(inputId=name,label=sliderLabel, min=0.99*temp[1], max=1.01*temp[2], value=c(0.99*temp[1],1.01*temp[2]))
      }
 }
 
@@ -528,4 +536,88 @@ calculateSummaryVariables_Threshold <- function(locResults, CKThresh_SD, DAPIThr
      summary <- locResults[,c('Id','DAPI','CK','CD45','AR','AR.Nuc','AR.Cyt','AR.NucPer','AR.NucPerFlag','DAPI.Flag','CK.Flag','CD45.Flag','AR.Flag')]
 
      return(list(thresholds=list(CK=CKThresh, DAPI=DAPIThresh, CD45=CD45Thresh, AR=ARThresh), summary=summary))
+}
+
+fileChoose <- function(...) {
+     pathname <- NULL;
+     tryCatch({
+          pathname <- file.choose();
+     }, error = function(ex) {
+     })
+     pathname;
+}
+
+getMontage <- function(images)
+{
+     #images <- list('395 X 425 Nuclear'=readImage('/Users/jaywarrick/Downloads/blobs.png'))
+
+     if(is.null(images) || length(images)==0)
+     {
+          grid.newpage()
+          return
+     }
+
+     n <- length(images)
+
+     top.vp <- viewport(layout=grid.layout(2, 3,
+                                           widths=unit(rep(1/3, 3), rep("npc",3)),
+                                           heights=unit(c(0.2,0.8), rep("npc",2))))
+
+     #i <- 1
+     theList <- lapply(1:n, function(i){
+          viewport(layout.pos.col = i, layout.pos.row = 1, name = paste0('label',i))
+     })
+
+     theList <- append(theList, lapply(1:n, function(i){
+          viewport(layout.pos.col = i, layout.pos.row = 2, name = paste0('image',i))
+     }))
+
+
+     grid.newpage()
+     montage <- vpTree(top.vp, do.call(vpList, theList))
+     pushViewport(montage)
+
+
+     for(i in 1:n)
+     {
+          seekViewport(paste0('label',i))
+          grid.text(names(images)[i])
+     }
+     for(i in 1:n)
+     {
+          seekViewport(paste0('image',i))
+          grid.draw(rasterGrob(images[[i]]))
+     }
+}
+
+getAdjustedImage <- function(image, limits)
+{
+     if(length(limits)!=2)
+     {
+          return(image)
+     }
+     (image-limits[1])/(limits[2]-limits[1])
+}
+
+save.xlsx <- function (file, ...)
+{
+     require(xlsx, quietly = TRUE)
+     if(!is.null(file))
+     {
+          objects <- list(...)
+          fargs <- as.list(match.call(expand.dots = TRUE))
+          objnames <- as.character(fargs)[-c(1, 2)]
+          nobjects <- length(objects)
+          for (i in 1:nobjects) {
+               if (i == 1)
+                    write.xlsx(objects[[i]], file, sheetName = objnames[i])
+               else write.xlsx(objects[[i]], file, sheetName = objnames[i],
+                               append = TRUE)
+          }
+          print(paste("Workbook", file, "has", nobjects, "worksheets."))
+     }
+     else
+     {
+          print("Couldn't save. No file specified.")
+     }
 }

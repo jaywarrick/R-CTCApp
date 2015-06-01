@@ -17,7 +17,7 @@ title: "CTC App Report"
 * `r getThreshText(column=input$y1, thresh=y1Thresh(), auto=input$y1Auto, log=input$y1Log, range=input$y1Range)` (`r if(input$y1Auto==1){'Automatic'}else{'Manual'}`)  
   
 ```{r echo=FALSE}
-getPlot(table=theTable(), x=input$x1, y=input$y1, goodOld=TRUE, goodNew=theGood1(), logX=input$x1Log, logY=input$y1Log, randoms=theRandoms(), autoX=input$x1Auto, autoY=input$y1Auto, threshX=x1Thresh(), threshY=y1Thresh(), rangeX=input$x1Range, rangeY=input$y1Range)
+getPlot(table=theTable(), x=input$x1, y=input$y1, goodOld=!theGood1(), goodNew=theGood1(), logX=input$x1Log, logY=input$y1Log, randoms=theRandoms(), autoX=input$x1Auto, autoY=input$y1Auto, threshX=x1Thresh(), threshY=y1Thresh(), rangeX=input$x1Range, rangeY=input$y1Range, Id=NULL, stateTable=values$stateTable)
 ```
   
 ## Filter 2
@@ -35,7 +35,7 @@ getPlot(table=theTable(), x=input$x1, y=input$y1, goodOld=TRUE, goodNew=theGood1
 * `r getThreshText(column=input$y2, thresh=y2Thresh(), auto=input$y2Auto, log=input$y2Log, range=input$y2Range)` (`r if(input$y2Auto==1){'Automatic'}else{'Manual'}`)
 
 ```{r echo=FALSE}
-getPlot(table=theTable(), x=input$x2, y=input$y2, goodOld=theGood1(), goodNew=theGood1() & theGood2(), logX=input$x2Log, logY=input$y2Log, randoms=theRandoms(), autoX=input$x2Auto, autoY=input$y2Auto, threshX=x2Thresh(), threshY=y2Thresh(), rangeX=input$x2Range, rangeY=input$y2Range)
+getPlot(table=theTable(), x=input$x2, y=input$y2, goodOld=theGood1() & !theGood2(), goodNew=theGood1() & theGood2(), logX=input$x2Log, logY=input$y2Log, randoms=theRandoms(), autoX=input$x2Auto, autoY=input$y2Auto, threshX=x2Thresh(), threshY=y2Thresh(), rangeX=input$x2Range, rangeY=input$y2Range, Id=NULL, stateTable=values$stateTable)
 ```
 
 ## Filter 3
@@ -53,7 +53,7 @@ getPlot(table=theTable(), x=input$x2, y=input$y2, goodOld=theGood1(), goodNew=th
 * `r getThreshText(column=input$y3, thresh=y3Thresh(), auto=input$y3Auto, log=input$y3Log, range=input$y3Range)` (`r if(input$y3Auto==1){'Automatic'}else{'Manual'}`)
 
 ```{r echo=FALSE}
-getPlot(table=theTable(), x=input$x3, y=input$y3, goodOld=theGood1() & theGood2(), goodNew=theGood1() & theGood2() & theGood3(), logX=input$x3Log, logY=input$y3Log, randoms=theRandoms(), autoX=input$x3Auto, autoY=input$y3Auto, threshX=x3Thresh(), threshY=y3Thresh(), rangeX=input$x3Range, rangeY=input$y3Range)
+getPlot(table=theTable(), x=input$x3, y=input$y3, goodOld=(theGood1() & theGood2()) & !(theGood1() & theGood2() & theGood3()), goodNew=(theGood1() & theGood2() & theGood3()), logX=input$x3Log, logY=input$y3Log, randoms=theRandoms(), autoX=input$x3Auto, autoY=input$y3Auto, threshX=x3Thresh(), threshY=y3Thresh(), rangeX=input$x3Range, rangeY=input$y3Range, Id=NULL, stateTable=values$stateTable)
 ```
 
 ## Final Plot 1
@@ -69,5 +69,16 @@ getPlot(table=theTable(), x=input$x3, y=input$y3, goodOld=theGood1() & theGood2(
 * Scale: `r if(input$y4Log==1){'Log'}else{'Linear'}`
 
 ```{r echo=FALSE}
-getPlot(table=theTable(), x=input$x4, y=input$y4, goodOld=!(theGood1() & theGood2() & theGood3()), goodNew=(theGood1() & theGood2() & theGood3()), logX=input$x4Log, logY=input$y4Log, randoms=theRandoms(), autoX=NULL, autoY=NULL, threshX=NULL, threshY=NULL, rangeX=NULL, rangeY=NULL)
+getPlot(table=theTable(), x=input$x4, y=input$y4, goodOld=!(theGood1() & theGood2() & theGood3()), goodNew=(theGood1() & theGood2() & theGood3()), logX=input$x4Log, logY=input$y4Log, randoms=theRandoms(), autoX=NULL, autoY=NULL, threshX=NULL, threshY=NULL, rangeX=NULL, rangeY=NULL, Id=NULL, stateTable=values$stateTable)
 ```
+
+# State Summary
+
+* Yes: `r length(which(values$stateTable$No.Maybe.Yes == 2))` (`r round(100 * length(which(values$stateTable$No.Maybe.Yes == 2)) / nrow(values$stateTable), digits=1)`%)
+* No: `r length(which(values$stateTable$No.Maybe.Yes == 0))` (`r round(100 * length(which(values$stateTable$No.Maybe.Yes == 0)) / nrow(values$stateTable), digits=1)`%)
+* Maybe: `r length(which(values$stateTable$No.Maybe.Yes == 1))` (`r round(100 * length(which(values$stateTable$No.Maybe.Yes == 1)) / nrow(values$stateTable), digits=1)`%)
+
+# Saved Output
+
+* `r file.path(savedDataPath, paste0(input$reportName, ".xlsx"))`
+

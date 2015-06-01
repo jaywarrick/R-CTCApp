@@ -14,3 +14,7 @@
 *.history
 
 *.pdf
+
+*.xlsx
+
+.Rhistory

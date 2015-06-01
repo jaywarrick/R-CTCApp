@@ -8,9 +8,11 @@ shinyUI(fluidPage(
 
                width=5,
 
-               actionButton("closeButton", "Click HERE to CLOSE app properly!"),
+               fluidRow(column(width=12, actionButton("closeButton", "Click HERE to CLOSE app properly!"))),
 
-               fileInput("data", label="Data file"),
+               br(),
+
+               fluidRow(column(width=5, actionButton("dataButton", as.character(tags$small("Choose Data...")))), column(width=7, tags$small(textOutput("filePath")))),
 
                getFilterUI(1),
 
@@ -22,7 +24,33 @@ shinyUI(fluidPage(
 
                hr(),
 
-               downloadButton('downloadReport')
+               uiOutput("cellIndexer"),
+
+               fluidRow(
+                    column(width=6, align="left", actionButton("prevButton", "Prev.")),
+                    column(width=6, align="right", actionButton("nextButton", "Next"))
+               ),
+
+               br(),
+
+               fluidRow(
+                    column(width=4, align="left", actionButton("noButton", "No")),
+                    column(width=4, align="center", actionButton("maybeButton", "Maybe")),
+                    column(width=4, align="right", actionButton("yesButton", "Yes"))
+               ),
+
+               uiOutput("state"),
+
+               hr(),
+
+               fluidRow(
+                    column(width=12, textInput("reportName", label = "Report Name (no file extension)", value = "CTC Report")),
+                    column(width=12, actionButton("saveButton", "Save Report and Data"))
+               ),
+
+               hr(),
+
+               fluidRow(column(width=12, actionButton("closeButton2", "Click HERE to CLOSE app properly!")))
 
           ),
 
@@ -45,7 +73,12 @@ shinyUI(fluidPage(
                br(),
                plotOutput("plot3"),
                br(),
-               plotOutput("plot4")
+               plotOutput("plot4"),
+               hr(),
+               fluidRow(column(width=12,plotOutput("montage1"))),
+               uiOutput('adjusters1'),
+               fluidRow(column(width=12,plotOutput("montage2"))),
+               uiOutput('adjusters2')
           )
      )
 
