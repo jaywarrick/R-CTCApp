@@ -103,13 +103,14 @@ shinyServer(function(input, output, session) {
                path <- values$dataPath
                temp <- data.frame(reorganizeTable(read.arff(path)))
           }
-          totCols <- grepl("Tot", names(temp))
-          theNames <- names(temp)[totCols]
-          theNewNames <- sub("Tot", "Mean", theNames)
-          for(i in 0:(length(theNames)-1))
-          {
-               temp[,theNewNames[i+1]] <- temp[,theNames[i+1]] / temp$n
-          }
+          # This is done in JEX now
+          #           totCols <- grepl("Tot", names(temp))
+          #           theNames <- names(temp)[totCols]
+          #           theNewNames <- sub("Tot", "Mean", theNames)
+          #           for(i in 0:(length(theNames)-1))
+          #           {
+          #                temp[,theNewNames[i+1]] <- temp[,theNames[i+1]] / temp$n
+          #           }
           return(temp)
      })
      theNumerics <- reactive({ sapply(theTable(), is.numeric) })
