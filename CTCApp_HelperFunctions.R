@@ -258,6 +258,7 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
           if(!is.null(stateTable) && nrow(stateTable) > 0)
           {
                points(x1[stateTable$No.Maybe.Yes==2], y1[stateTable$No.Maybe.Yes==2], pch=4, cex=1, col='black')
+               points(x1[stateTable$No.Maybe.Yes==1], y1[stateTable$No.Maybe.Yes==1], pch=1, cex=1, col='black')
           }
 
           # Plot threshold lines

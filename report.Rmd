@@ -74,9 +74,9 @@ getPlot(table=theTable(), x=input$x4, y=input$y4, goodOld=!(theGood1() & theGood
 
 # State Summary
 
-* Yes: `r length(which(values$stateTable$No.Maybe.Yes == 2))` (`r round(100 * length(which(values$stateTable$No.Maybe.Yes == 2)) / nrow(values$stateTable), digits=1)`%)
+* Yes: `r length(which(values$stateTable$No.Maybe.Yes == 2))` (`r round(100 * length(which(values$stateTable$No.Maybe.Yes == 2)) / nrow(values$stateTable), digits=1)`%) ('X' symbols)
 * No: `r length(which(values$stateTable$No.Maybe.Yes == 0))` (`r round(100 * length(which(values$stateTable$No.Maybe.Yes == 0)) / nrow(values$stateTable), digits=1)`%)
-* Maybe: `r length(which(values$stateTable$No.Maybe.Yes == 1))` (`r round(100 * length(which(values$stateTable$No.Maybe.Yes == 1)) / nrow(values$stateTable), digits=1)`%)
+* Maybe: `r length(which(values$stateTable$No.Maybe.Yes == 1))` (`r round(100 * length(which(values$stateTable$No.Maybe.Yes == 1)) / nrow(values$stateTable), digits=1)`%) ('O' symbols)
 * Total: `r nrow(values$stateTable)`
 
 # Saved Output

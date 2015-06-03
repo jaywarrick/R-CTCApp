@@ -18,3 +18,5 @@
 *.xlsx
 
 .Rhistory
+
+*.zip
