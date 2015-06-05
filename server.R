@@ -1,5 +1,4 @@
 rm(list=ls())
-source("/Users/jaywarrick/Public/DropBox/GitHub/R-CTCApp/CTCApp_HelperFunctions.R")
 library(foreign)
 library(data.table)
 library(EBImage)
