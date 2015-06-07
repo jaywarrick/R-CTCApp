@@ -1,3 +1,4 @@
+print("Running the helper functions file")
 
 reorganizeTable <- function(data, baseName=NA, convertToNumeric=TRUE)
 {
@@ -621,4 +622,10 @@ save.xlsx <- function (file, ...)
      {
           print("Couldn't save. No file specified.")
      }
+}
+
+runCTCApp <- function()
+{
+     dataPath <- fileChoose()
+     shinyApp(ui=getUI, server=getServer(dataPath))
 }
