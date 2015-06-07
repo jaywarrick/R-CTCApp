@@ -81,5 +81,5 @@ getPlot(table=theTable(), x=input$x4, y=input$y4, goodOld=!(theGood1() & theGood
 
 # Saved Output
 
-* `r file.path(savedDataPath, paste0(input$reportName, ".xlsx"))`
+* `r file.path(dirname(values$dataPath), paste0(input$reportName, ".xlsx"))`
 
