@@ -225,7 +225,8 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
                x1 <- table[,x]
                if(logX == 1)
                {
-                    xlim <- range(x1[x1 > 0])
+                    xlim <- logicle(range(x1))
+                    x1 <- logicle(x1)
                }
                else
                {
@@ -242,14 +243,18 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
                y1 <- table[,y]
                if(logY == 1)
                {
-                    ylim <- range(y1[y1 > 0])
+                    ylim <- logicle(range(y1))
+                    y1 <- logicle(y1)
                }
                else
                {
                     ylim <- range(y1)
                }
           }
-          plot(x1[bad], y1[bad], pch=20, col=rgb(0,0,1,0.25), bg=rgb(0,0,1,0.25), xlim=xlim, ylim=ylim, xlab=x, ylab=y, log=getLogParam(logX, logY))
+          plot(c(),c(), xlim=xlim, ylim=ylim, xlab=x, ylab=y, axes=FALSE, log=getLogParam(logX, logY))
+          box(col='black',lwd=2)
+          #plot(x1[bad], y1[bad], pch=20, col=rgb(0,0,1,0.25), bg=rgb(0,0,1,0.25), xlim=xlim, ylim=ylim, xlab=x, ylab=y, log=)
+          points(x1[bad], y1[bad], pch=20, col=rgb(0,0,1,0.25), bg=rgb(0,0,1,0.25))
           points(x1[goodOld], y1[goodOld], pch=20, col=rgb(1,0,0,0.25), bg=rgb(1,0,0,0.25))
           points(x1[goodNew], y1[goodNew], pch=20, col=rgb(0,1,0,0.25), bg=rgb(0,1,0,0.25))
           if(!is.null(Id))
@@ -262,12 +267,37 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
                points(x1[stateTable$No.Maybe.Yes==1], y1[stateTable$No.Maybe.Yes==1], pch=1, cex=1, col='black')
           }
 
+          # Draw axes
+          if(logX == 1)
+          {
+               drawLogicleAxis(axisNum=1)
+          }
+          else
+          {
+               axis(1)
+          }
+          if(logY == 1)
+          {
+               drawLogicleAxis(axisNum=2)
+          }
+          else
+          {
+               axis(2)
+          }
+
           # Plot threshold lines
           if(!is.null(autoX))
           {
                if(autoX == 1)
                {
-                    abline(v=threshX)
+                    if(logX == 1)
+                    {
+                         abline(v=threshX)
+                    }
+                    else
+                    {
+                         abline(v=logicle(threshX))
+                    }
                }
                else
                {
@@ -285,13 +315,20 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
           {
                if(autoY == 1)
                {
-                    abline(h=threshY)
+                    if(logY == 1)
+                    {
+                         abline(h=threshY)
+                    }
+                    else
+                    {
+                         abline(h=logicle(threshY))
+                    }
                }
                else
                {
                     if(logY == 1)
                     {
-                         abline(h=10^rangeY)
+                         abline(h=logicle(10^rangeY))
                     }
                     else
                     {
@@ -300,6 +337,47 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
                }
           }
      }
+}
+
+logicle <- function(x, transitionPoint=1, linearUnitsPerOrder=100)
+{
+     linearDifference = x - transitionPoint;
+     valsToAdjust <- linearDifference <= 0;
+     ordersDifferenceOnDisplay = linearDifference / linearUnitsPerOrder;
+     linearDifference[valsToAdjust] <- transitionPoint * 10^(ordersDifferenceOnDisplay[valsToAdjust]);
+     x[valsToAdjust] <- transitionPoint*10^(-1*((transitionPoint-x[valsToAdjust])/linearUnitsPerOrder))
+
+     return(x)
+}
+
+unlogicle <- function(x, transitionPoint=1, linearUnitsPerOrder=100)
+{
+     # Just do it for the right indicies
+     valsToAdjust <- x <= transitionPoint
+     ret <- x
+     ret[valsToAdjust] <- transitionPoint + log10(x[valsToAdjust]/transitionPoint)*linearUnitsPerOrder
+     return(ret)
+}
+
+drawLogicleAxis <- function(axisNum=1, transition=1, linLogRatio=100)
+{
+     linNums=c(-500,-400,-300,-200,-100,-50,0)
+     logNums=c(1,10,100,1000,10000,100000,1000000)
+
+     prettyNums <- c(linNums, logNums)
+
+     logSidePrettyLabels <- parse(text=paste("10^", log10(logNums), sep=""))
+     prettyLabels <- c(as.character(linNums), logSidePrettyLabels)
+     ticks <- logicle(prettyNums, transition, linLogRatio)
+     if(axisNum == 2)
+     {
+          axis(axisNum, at=ticks, labels=prettyLabels, las=2)
+     }
+     else
+     {
+          axis(axisNum, at=ticks, labels=prettyLabels)
+     }
+
 }
 
 getFilterUI <- function(i)
@@ -437,7 +515,8 @@ getSliderUI <- function(name, axis='x', table, column, auto, log)
           nums <- table[,column]
           if(log == 1)
           {
-               temp <- range(nums[nums > 0])
+               nums <- logicle(nums)
+               temp <- range(nums)
                temp <- log10(temp)
                sliderLabel <- s('log10(', axis, ')')
           }
@@ -446,7 +525,10 @@ getSliderUI <- function(name, axis='x', table, column, auto, log)
                temp <- range(nums)
                sliderLabel <- axis
           }
-          sliderInput(inputId=name,label=sliderLabel, min=0.99*temp[1], max=1.01*temp[2], value=c(0.99*temp[1],1.01*temp[2]))
+
+          myMin <- .99*temp[1]
+          myMax <- 1.01*temp[2]
+          sliderInput(inputId=name,label=sliderLabel, min=myMin, max=myMax, value=c(myMin,myMax))
      }
 }
 
