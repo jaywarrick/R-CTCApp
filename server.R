@@ -40,7 +40,7 @@ getServer <- function(dataPath)
                          temp1$No.Maybe.Yes <- sub("1", "Maybe", temp1$No.Maybe.Yes)
                          temp1$No.Maybe.Yes <- sub("2", "Yes", temp1$No.Maybe.Yes)
                          temp2 <- subset(temp1, No.Maybe.Yes == "Yes")
-                         if(length(which(temp1$No.Maybe.Yes==2))==0)
+                         if(nrow(temp2)==0)
                          {
                               # Just save temp1 and not temp2
                               save.xlsx(file.path(dirname(values$dataPath), paste0(input$reportName,".xlsx")), temp1)
