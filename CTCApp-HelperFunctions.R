@@ -215,6 +215,7 @@ getLogParam <- function(logX, logY)
 
 getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, autoY, threshX, threshY, rangeX, rangeY, Id=NULL, stateTable=NULL)
 {
+     print(paste0('Getting plot ', x, ' vs. ', y))
      if((is.null(x) && is.null(y)) || ((x == 'None') && (y == 'None')))
      {
           # Do nothing
@@ -240,7 +241,7 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
                }
                else
                {
-                    xlim <- range(x1)
+                    xlim <- range(x1, na.rm=TRUE)
                }
           }
           if(is.null(y) || y == 'None')
@@ -253,12 +254,12 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
                y1 <- table[,y]
                if(logY == 1)
                {
-                    ylim <- logicle(range(y1))
+                    ylim <- logicle(range(y1, na.rm=TRUE))
                     y1 <- logicle(y1)
                }
                else
                {
-                    ylim <- range(y1)
+                    ylim <- range(y1, na.rm=TRUE)
                }
           }
           plot(c(),c(), xlim=xlim, ylim=ylim, xlab=x, ylab=y, axes=FALSE, log=getLogParam(logX, logY))
