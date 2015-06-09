@@ -319,7 +319,14 @@ getServer <- function(dataPath)
           theIndex <- reactive({
                # This should eventually be "which(theGood1 & theGood2 & theGood3)[input$index]
                print("Updating theIndex")
-               input$index
+               if(is.null(input$index))
+               {
+                    return(1)
+               }
+               else
+               {
+                    return(input$index)
+               }
           })
 
           theId <- reactive({
