@@ -69,7 +69,7 @@ getPlot(table=theTable(), x=input$x3, y=input$y3, goodOld=(theGood1() & theGood2
 * Scale: `r if(input$y4Log==1){'Log'}else{'Linear'}`
 
 ```{r echo=FALSE}
-getPlot(table=theTable(), x=input$x4, y=input$y4, goodOld=!(theGood1() & theGood2() & theGood3()), goodNew=(theGood1() & theGood2() & theGood3()), logX=input$x4Log, logY=input$y4Log, randoms=theRandoms(), autoX=NULL, autoY=NULL, threshX=NULL, threshY=NULL, rangeX=NULL, rangeY=NULL, Id=NULL, stateTable=values$stateTable)
+getPlot(table=theTable(), x=input$x4, y=input$y4, goodOld=FALSE, goodNew=(theGood1() & theGood2() & theGood3()), logX=input$x4Log, logY=input$y4Log, randoms=theRandoms(), autoX=NULL, autoY=NULL, threshX=NULL, threshY=NULL, rangeX=NULL, rangeY=NULL, Id=NULL, stateTable=values$stateTable)
 ```
 
 # State Summary
