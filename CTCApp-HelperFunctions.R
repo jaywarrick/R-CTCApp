@@ -108,24 +108,34 @@ getAutoThresh <- function(filterNumber, table, column, tail, log, mads, logMads)
 getGood <- function(filterNumber, table, x, y, choiceX, choiceY, autoX, autoY, threshX, threshY, logX, logY, rangeX, rangeY)
 {
      # Grab either the + or minus population based on user choice and call it good and the other bad
+
+     if(!is.null(x) && x != 'None')
+     {
+          validX <- !is.na(table[,x])
+     }
      if(is.null(x) || x == 'None')
      {
           goodX <- rep(T, nrow(table))
      }
      else if(autoX==1)
      {
-          goodX <- (table[,x] >= threshX) == (choiceX == 1)
+          goodX <- validX & ((table[,x] >= threshX) == (choiceX == 1))
      }
      else
      {
           if(logX == 1)
           {
-               goodX <- ((table[,x] >= 10^rangeX[1]) & (table[,x] <= 10^rangeX[2]))  == (choiceX == 1)
+               goodX <- validX & (((table[,x] >= unlogicle(10^rangeX[1])) & (table[,x] <= unlogicle(10^rangeX[2]))) == (choiceX == 1))
           }
           else
           {
-               goodX <- ((table[,x] >= rangeX[1]) & (table[,x] <= rangeX[2]))  == (choiceX == 1)
+               goodX <- validX & (((table[,x] >= rangeX[1]) & (table[,x] <= rangeX[2]))  == (choiceX == 1))
           }
+     }
+
+     if(!is.null(y) && y != 'None')
+     {
+          validY <- !is.na(table[,y])
      }
      if(is.null(y) || y == 'None')
      {
@@ -133,17 +143,17 @@ getGood <- function(filterNumber, table, x, y, choiceX, choiceY, autoX, autoY, t
      }
      else if(autoY==1)
      {
-          goodY <- (table[,y] >= threshY) == (choiceY == 1)
+          goodY <- validY & ((table[,y] >= threshY) == (choiceY == 1))
      }
      else
      {
           if(logY == 1)
           {
-               goodY <- ((table[,y] >= 10^rangeY[1]) & (table[,y] <= 10^rangeY[2]))  == (choiceY == 1)
+               goodY <- validY & (((table[,y] >= unlogicle(10^rangeY[1])) & (table[,y] <= unlogicle(10^rangeY[2])))  == (choiceY == 1))
           }
           else
           {
-               goodY <- ((table[,y] >= rangeY[1]) & (table[,y] <= rangeY[2]))  == (choiceY == 1)
+               goodY <- validY & (((table[,y] >= rangeY[1]) & (table[,y] <= rangeY[2]))  == (choiceY == 1))
           }
      }
      goodX & goodY
@@ -172,7 +182,7 @@ getThreshText = function(column, thresh, auto, log, range)
      {
           if(log == 1)
           {
-               temp <- format(10^range, digits=3, scientific=TRUE)
+               temp <- format(unlogicle(10^range), digits=3, scientific=TRUE)
           }
           else
           {
@@ -225,7 +235,7 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
                x1 <- table[,x]
                if(logX == 1)
                {
-                    xlim <- logicle(range(x1))
+                    xlim <- logicle(range(x1, na.rm=TRUE))
                     x1 <- logicle(x1)
                }
                else
@@ -292,11 +302,11 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
                {
                     if(logX == 1)
                     {
-                         abline(v=threshX)
+                         abline(v=logicle(threshX))
                     }
                     else
                     {
-                         abline(v=logicle(threshX))
+                         abline(v=threshX)
                     }
                }
                else
@@ -339,27 +349,23 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
      }
 }
 
-logicle <- function(x, transitionPoint=1, linearUnitsPerOrder=100)
+logicle <- function(x, transitionPoint=100, linearUnitsPerOrder=100)
 {
-     linearDifference = x - transitionPoint;
-     valsToAdjust <- linearDifference <= 0;
-     ordersDifferenceOnDisplay = linearDifference / linearUnitsPerOrder;
-     linearDifference[valsToAdjust] <- transitionPoint * 10^(ordersDifferenceOnDisplay[valsToAdjust]);
-     x[valsToAdjust] <- transitionPoint*10^(-1*((transitionPoint-x[valsToAdjust])/linearUnitsPerOrder))
-
+     valsToAdjust <- (x <= transitionPoint) & !is.na(x)
+     ordersDifferenceOnDisplay = (x[valsToAdjust] - transitionPoint) / linearUnitsPerOrder
+     x[valsToAdjust] <- transitionPoint*10^(ordersDifferenceOnDisplay)
      return(x)
 }
 
-unlogicle <- function(x, transitionPoint=1, linearUnitsPerOrder=100)
+unlogicle <- function(x, transitionPoint=100, linearUnitsPerOrder=100)
 {
      # Just do it for the right indicies
-     valsToAdjust <- x <= transitionPoint
-     ret <- x
-     ret[valsToAdjust] <- transitionPoint + log10(x[valsToAdjust]/transitionPoint)*linearUnitsPerOrder
-     return(ret)
+     valsToAdjust <- (x <= transitionPoint) & !is.na(x)
+     x[valsToAdjust] <- transitionPoint + log10(x[valsToAdjust]/transitionPoint)*linearUnitsPerOrder
+     return(x)
 }
 
-drawLogicleAxis <- function(axisNum=1, transition=1, linLogRatio=100)
+drawLogicleAxis <- function(axisNum=1, transition=100, linLogRatio=100)
 {
      linNums=c(-500,-400,-300,-200,-100,-50,0)
      logNums=c(1,10,100,1000,10000,100000,1000000)
@@ -513,21 +519,34 @@ getSliderUI <- function(name, axis='x', table, column, auto, log)
      if (!is.null(column)  && column != 'None' && auto==2)
      {
           nums <- table[,column]
-          if(log == 1)
+          temp <- range(nums, na.rm=TRUE)
+          if(temp[1] < 0)
           {
-               nums <- logicle(nums)
-               temp <- range(nums)
-               temp <- log10(temp)
-               sliderLabel <- s('log10(', axis, ')')
+               myMin <- 1.05*temp[1]
           }
           else
           {
-               temp <- range(nums)
-               sliderLabel <- axis
+               myMin <- 0.95*temp[1]
+          }
+          if(temp[2] < 0)
+          {
+               myMax <- 0.98*temp[2]
+          }
+          else
+          {
+               myMax <- 1.02*temp[2]
           }
 
-          myMin <- .99*temp[1]
-          myMax <- 1.01*temp[2]
+          if(log == 1)
+          {
+               myMin <- log10(logicle(myMin))
+               myMax <- log10(logicle(myMax))
+               sliderLabel <- s('logicle10(', axis, ')')
+          }
+          else
+          {
+               sliderLabel <- axis
+          }
           sliderInput(inputId=name,label=sliderLabel, min=myMin, max=myMax, value=c(myMin,myMax))
      }
 }
