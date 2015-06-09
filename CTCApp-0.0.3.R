@@ -7,7 +7,7 @@ library(gridGraphics)
 library(foreign)
 library(xlsx)
 
-setwd('~/Desktop/CTCApp')
+setwd('~/Public/DropBox/GitHub/R-CTCApp')
 source('CTCApp-HelperFunctions.R')
 source('server.R')
 source('ui.R')
