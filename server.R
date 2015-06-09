@@ -147,7 +147,7 @@ getServer <- function(dataPath)
           ##### Final Plot 1 #####
           output$x4Select <- renderUI({ selectInput(inputId="x4", label = h4("X axis"), choices = c("None", theNames()[theNumerics()]), selected = "None") })
           output$y4Select <- renderUI({ selectInput(inputId="y4", label = h4("Y axis"), choices = c("None", theNames()[theNumerics()]), selected = "None") })
-          thePlot4 <- reactive({ getPlot(table=theTable(), x=input$x4, y=input$y4, goodOld=!(theGood1() & theGood2() & theGood3()), goodNew=(theGood1() & theGood2() & theGood3()), logX=input$x4Log, logY=input$y4Log, randoms=theRandoms(), autoX=NULL, autoY=NULL, threshX=NULL, threshY=NULL, rangeX=NULL, rangeY=NULL, Id=theId(), stateTable=values$stateTable) })
+          thePlot4 <- reactive({ getPlot(table=theTable(), x=input$x4, y=input$y4, goodOld=FALSE, goodNew=(theGood1() & theGood2() & theGood3()), logX=input$x4Log, logY=input$y4Log, randoms=theRandoms(), autoX=NULL, autoY=NULL, threshX=NULL, threshY=NULL, rangeX=NULL, rangeY=NULL, Id=theId(), stateTable=values$stateTable) })
           output$plot4 <- renderPlot({ thePlot4() })
 
           ##### Single Cell Validation #####
