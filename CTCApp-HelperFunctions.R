@@ -267,7 +267,7 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
           #plot(x1[bad], y1[bad], pch=20, col=rgb(0,0,1,0.25), bg=rgb(0,0,1,0.25), xlim=xlim, ylim=ylim, xlab=x, ylab=y, log=)
           points(x1[bad], y1[bad], pch=20, col=rgb(0,0,1,0.25), bg=rgb(0,0,1,0.25))
           points(x1[goodOld], y1[goodOld], pch=20, col=rgb(1,0,0,0.25), bg=rgb(1,0,0,0.25))
-          points(x1[goodNew], y1[goodNew], pch=20, col=rgb(0,1,0,0.25), bg=rgb(0,1,0,0.25))
+          points(x1[goodNew], y1[goodNew], pch=20, col=rgb(0,0.8,0,0.25), bg=rgb(0,0.8,0,0.25))
           if(!is.null(Id))
           {
                points(x1[table$Id==Id], y1[table$Id==Id], pch=10, cex=2, col='black')
@@ -328,18 +328,18 @@ getPlot <- function(table, x, y, goodOld, goodNew, logX, logY, randoms, autoX, a
                {
                     if(logY == 1)
                     {
-                         abline(h=threshY)
+                        abline(h=logicle(threshY))
                     }
                     else
                     {
-                         abline(h=logicle(threshY))
+                        abline(h=threshY)
                     }
                }
                else
                {
                     if(logY == 1)
                     {
-                         abline(h=logicle(10^rangeY))
+                         abline(h=10^rangeY)
                     }
                     else
                     {
