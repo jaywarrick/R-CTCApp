@@ -29,11 +29,42 @@ getServer <- function(dataPath)
           observe({
                if(!is.null(input$saveButton) && input$saveButton > 0)
                {
+                    width <- 6
+                    height <- 4.5
                     src <- normalizePath('report.Rmd')
                     library(rmarkdown)
                     isolate({
+                      
+                         hiRes <- file.path(dirname(values$dataPath), paste0(input$reportName,"_plot1",".pdf"))
+                         if(file.exists(hiRes))
+                         {
+                              file.remove(hiRes);
+                         }
+                         pdf(file = hiRes, width = width, height = height)
+                         getPlot(table=theTable(), x=input$x1, y=input$y1, goodOld=!theGood1(), goodNew=theGood1(), logX=input$x1Log, logY=input$y1Log, randoms=theRandoms(), autoX=input$x1Auto, autoY=input$y1Auto, threshX=x1Thresh(), threshY=y1Thresh(), rangeX=input$x1Range, rangeY=input$y1Range, Id=NULL, stateTable=values$stateTable)
+                         dev.off()
+                         
+                         hiRes <- file.path(dirname(values$dataPath), paste0(input$reportName,"_plot2",".pdf"))
+                         if(file.exists(hiRes))
+                         {
+                           file.remove(hiRes);
+                         }
+                         pdf(file = hiRes, width = width, height = height)
+                         getPlot(table=theTable(), x=input$x2, y=input$y2, goodOld=!theGood2(), goodNew=theGood2(), logX=input$x2Log, logY=input$y2Log, randoms=theRandoms(), autoX=input$x2Auto, autoY=input$y2Auto, threshX=x2Thresh(), threshY=y2Thresh(), rangeX=input$x2Range, rangeY=input$y2Range, Id=NULL, stateTable=values$stateTable)
+                         dev.off()
+                         
+                         hiRes <- file.path(dirname(values$dataPath), paste0(input$reportName,"_plot3",".pdf"))
+                         if(file.exists(hiRes))
+                         {
+                           file.remove(hiRes);
+                         }
+                         pdf(file = hiRes, width = width, height = height)
+                         getPlot(table=theTable(), x=input$x3, y=input$y3, goodOld=!theGood3(), goodNew=theGood3(), logX=input$x3Log, logY=input$y3Log, randoms=theRandoms(), autoX=input$x3Auto, autoY=input$y3Auto, threshX=x3Thresh(), threshY=y3Thresh(), rangeX=input$x3Range, rangeY=input$y3Range, Id=NULL, stateTable=values$stateTable)
+                         dev.off()
+                         
                          out <- render('report.Rmd', word_document(), runtime='static')
                          file.rename(out, file.path(dirname(values$dataPath), paste0(input$reportName,".docx")))
+                         
                          temp1 <- theTable()
                          temp1$No.Maybe.Yes <- values$stateTable$No.Maybe.Yes
                          temp1$No.Maybe.Yes <- sub(0, "No", temp1$No.Maybe.Yes)
@@ -49,6 +80,7 @@ getServer <- function(dataPath)
                          {
                               save.xlsx(file.path(dirname(values$dataPath), paste0(input$reportName,".xlsx")), temp1, temp2)
                          }
+                         
                     })
                }
           })
