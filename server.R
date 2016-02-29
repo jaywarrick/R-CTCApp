@@ -50,7 +50,7 @@ getServer <- function(dataPath)
                            file.remove(hiRes);
                          }
                          pdf(file = hiRes, width = width, height = height)
-                         getPlot(table=theTable(), x=input$x2, y=input$y2, goodOld=!theGood2(), goodNew=theGood2(), logX=input$x2Log, logY=input$y2Log, randoms=theRandoms(), autoX=input$x2Auto, autoY=input$y2Auto, threshX=x2Thresh(), threshY=y2Thresh(), rangeX=input$x2Range, rangeY=input$y2Range, Id=NULL, stateTable=values$stateTable)
+                         getPlot(table=theTable(), x=input$x2, y=input$y2, goodOld=theGood1() & !theGood2(), goodNew=theGood1() & theGood2(), logX=input$x2Log, logY=input$y2Log, randoms=theRandoms(), autoX=input$x2Auto, autoY=input$y2Auto, threshX=x2Thresh(), threshY=y2Thresh(), rangeX=input$x2Range, rangeY=input$y2Range, Id=theId(), stateTable=values$stateTable)
                          dev.off()
                          
                          hiRes <- file.path(dirname(values$dataPath), paste0(input$reportName,"_plot3",".pdf"))
@@ -59,7 +59,7 @@ getServer <- function(dataPath)
                            file.remove(hiRes);
                          }
                          pdf(file = hiRes, width = width, height = height)
-                         getPlot(table=theTable(), x=input$x3, y=input$y3, goodOld=!theGood3(), goodNew=theGood3(), logX=input$x3Log, logY=input$y3Log, randoms=theRandoms(), autoX=input$x3Auto, autoY=input$y3Auto, threshX=x3Thresh(), threshY=y3Thresh(), rangeX=input$x3Range, rangeY=input$y3Range, Id=NULL, stateTable=values$stateTable)
+                         getPlot(table=theTable(), x=input$x3, y=input$y3, goodOld=(theGood1() & theGood2()) & !(theGood1() & theGood2() & theGood3()), goodNew=(theGood1() & theGood2() & theGood3()), logX=input$x3Log, logY=input$y3Log, randoms=theRandoms(), autoX=input$x3Auto, autoY=input$y3Auto, threshX=x3Thresh(), threshY=y3Thresh(), rangeX=input$x3Range, rangeY=input$y3Range, Id=theId(), stateTable=values$stateTable)
                          dev.off()
                          
                          out <- render('report.Rmd', word_document(), runtime='static')
